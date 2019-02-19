@@ -25,7 +25,7 @@ test('should return array of exported json data', () => {
   expect(archive[1].do_objectID).toEqual(String(objects[1].id))
 })
 
-test('should restore object from json data', () => {
+test('should restore shape from json data', () => {
   const object = new Shape()
   const archive = exportObject(object, {
     formats: ['json'],
@@ -33,6 +33,27 @@ test('should restore object from json data', () => {
   })
   const restored = objectFromJSON(archive)
   expect(restored.id).toEqual(String(object.id))
+})
+
+test('should restore shared style from json data', (context, document) => {
+  const { style } = new Shape()
+  const doc = document
+  doc.sharedLayerStyles = [
+    {
+      style,
+      name: 'My Style',
+    },
+  ]
+  const sharedStyle = doc.sharedLayerStyles[0]
+  const archive = exportObject(sharedStyle, {
+    formats: ['json'],
+    output: false,
+  })
+  const restored = objectFromJSON(archive)
+  expect(restored.type).toBe('SharedStyle')
+  expect(restored.style.styleType).toBe('Layer')
+  expect(String(restored.styleType)).toBe('3')
+  expect(restored.id).toEqual(sharedStyle.id)
 })
 
 test('Should fail with no object provided', () => {
@@ -69,15 +90,4 @@ test('should fail with to return with multiple formats', () => {
   } catch (err) {
     expect(err.message).toMatch('Can only return 1 format with no output type')
   }
-})
-
-test('Should restore shared style', () => {
-  const styleJSON =
-    '{"_class":"sharedStyle","do_objectID":"F5E30A31-048F-49AB-82DA-2EFB65C01E5F","name":"Rectangle Style","value":{"_class":"style","borders":[{"_class":"border","isEnabled":false,"color":{"_class":"color","alpha":1,"blue":0.592,"green":0.592,"red":0.592},"fillType":0,"position":1,"thickness":1}],"endMarkerType":0,"fills":[{"_class":"fill","isEnabled":true,"color":{"_class":"color","alpha":1,"blue":0.8955275153082571,"green":0.9697066326530612,"red":0.2686359796345148},"fillType":0,"noiseIndex":0,"noiseIntensity":0,"patternFillType":0,"patternTileScale":1}],"miterLimit":10,"startMarkerType":0,"windingRule":1}}'
-
-  const object = objectFromJSON(JSON.parse(styleJSON), 112)
-  expect(object.type).toBe('SharedStyle')
-  expect(object.style.styleType).toBe('Layer')
-  expect(String(object.styleType)).toBe('3')
-  expect(object.id).toEqual('F5E30A31-048F-49AB-82DA-2EFB65C01E5F')
 })
