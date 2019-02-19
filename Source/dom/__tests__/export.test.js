@@ -77,6 +77,7 @@ test('Should restore shared style', () => {
 
   const object = objectFromJSON(JSON.parse(styleJSON), 112)
   expect(object.type).toBe('SharedStyle')
-  expect(object.styleType).toBe('Layer')
+  expect(object.style.styleType).toBe('Layer')
+  expect(String(object.styleType)).toBe('3')
   expect(object.id).toEqual('F5E30A31-048F-49AB-82DA-2EFB65C01E5F')
 })
